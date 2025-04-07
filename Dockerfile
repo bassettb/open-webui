@@ -167,6 +167,15 @@ EXPOSE 8080
 
 HEALTHCHECK CMD curl --silent --fail http://localhost:${PORT:-8080}/health | jq -ne 'input.status == true' || exit 1
 
+# Now run as non-root
+ARG UID=1000
+ARG GID=1000
+
+RUN addgroup --gid $GID app
+RUN adduser --uid $UID --gid $GID --home $HOME --disabled-password --no-create-home app
+
+RUN chown -R $UID:$GID /app $HOME
+
 USER $UID:$GID
 
 ARG BUILD_HASH
